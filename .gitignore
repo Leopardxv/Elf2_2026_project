@@ -1,0 +1,61 @@
+# Models — too large for GitHub
+*.gguf
+*.rkllm
+*.rknn
+*.onnx
+*.pth
+*.pt
+*.npy
+*.zip
+*.tar.bz2
+*.tar.gz
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Node
+node_modules/
+
+# Build
+build/
+install/
+log/
+
+# IDE
+.vscode/
+.idea/
+
+# Large data
+*.log
+Recordings/
+Console_Data/
+data/
+
+# Temp
+/tmp/
+*.wav
+*.jpg
+
+# ROS2 build artifacts
+xiaoche_ws/build/
+xiaoche_ws/install/
+xiaoche_ws/log/
+
+# Compressed SDK
+ai/
+bci/OpenBCI_GUI_source/
+bci/OpenBCI_GUI/
+emotions/EEG-Conformer/eeg_conformer.rknn
+models/
+# Sample data and recordings
+bci/OpenBCI_GUI/Sample_Data/
+bci/OpenBCI_GUI/Recordings/
+bci/OpenBCI_GUI/Console_Data/
+
+# All model files
+models/
+
+# PDFs
+*.pdf
