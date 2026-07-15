@@ -1,0 +1,11 @@
+[Unit]
+Description=Poll for ELF2 server updates without a resident sync process
+
+[Timer]
+OnBootSec=45s
+OnUnitActiveSec=10s
+AccuracySec=2s
+Persistent=true
+
+[Install]
+WantedBy=timers.target

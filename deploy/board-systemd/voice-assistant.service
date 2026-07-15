@@ -1,0 +1,41 @@
+[Unit]
+Description=精灵精灵 Voice Assistant
+After=bluetooth.target sound.target pulseaudio.service bbh-audio.service
+Wants=bluetooth.target pulseaudio.service bbh-audio.service
+StartLimitIntervalSec=120
+StartLimitBurst=3
+
+[Service]
+Type=simple
+ExecStart=/home/elf/Projects/voice_assistant/autostart.sh
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=30
+# Keep GNOME responsive on the 4 GiB board while the NPU model is resident.
+ExecStartPre=/bin/sleep 25
+Nice=5
+CPUWeight=50
+MemoryHigh=1300M
+MemoryMax=1500M
+MemorySwapMax=0
+OOMPolicy=stop
+Environment=DISPLAY=:1
+Environment=XAUTHORITY=/run/user/1000/gdm/Xauthority
+Environment=PYTHONUNBUFFERED=1
+Environment=VOICE_MIC_DEVICE=default
+Environment=VOICE_MIC_CHANNELS=1
+# More robust decoding for the BBH narrow-band microphone.
+Environment=VOICE_ASR_MODEL_DIR=/home/elf/Projects/models/asr/sherpa-onnx-streaming-zipformer-zh-int8-2025-06-30
+Environment=VOICE_KWS_ENERGY_THRESHOLD=0.0045
+Environment=VOICE_ASR_ENERGY_THRESHOLD=0.0045
+Environment=VOICE_ASR_MAX_ENERGY_THRESHOLD=0.025
+Environment=VOICE_TTS_CACHE=0
+Environment=PULSE_SERVER=unix:/run/user/1000/pulse/native
+Environment=MALLOC_ARENA_MAX=2
+Environment=MALLOC_TRIM_THRESHOLD_=262144
+Environment=OPENBLAS_NUM_THREADS=1
+Environment=MKL_NUM_THREADS=1
+Environment=NUMEXPR_NUM_THREADS=1
+
+[Install]
+WantedBy=default.target

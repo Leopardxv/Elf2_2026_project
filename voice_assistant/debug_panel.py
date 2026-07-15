@@ -31,8 +31,8 @@ MODELS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))
 VOSK_MODEL = os.path.join(MODELS, "vosk", "vosk-model-small-cn-0.22")
 LLM_MODEL = os.path.join(MODELS, "qwen2.5-0.5b-instruct-q2_k.gguf")
 SAMPLE_RATE = 16000
-MIC_DEVICE = 0
-MIC_CHANNEL = 1  # right channel = main mic on NAU8822
+MIC_DEVICE = os.getenv("VOICE_MIC_DEVICE", "default")
+MIC_CHANNEL = 0
 
 WAKE_KEYWORD = "精灵"
 ENERGY_THRESHOLD = 0.03
@@ -360,7 +360,7 @@ class VoiceDebugPanel(QMainWindow):
 
         self._mic_stream = sd.InputStream(
             samplerate=SAMPLE_RATE,
-            channels=2,
+            channels=1,
             dtype=np.float32,
             blocksize=chunk_frames,
             device=MIC_DEVICE,
@@ -466,7 +466,7 @@ class VoiceDebugPanel(QMainWindow):
     def _test_mic(self):
         self._log("🎤 测试麦克风 (3秒)...")
         try:
-            audio = sd.rec(int(3 * SAMPLE_RATE), samplerate=SAMPLE_RATE, channels=2, dtype='int16', device=MIC_DEVICE)
+            audio = sd.rec(int(3 * SAMPLE_RATE), samplerate=SAMPLE_RATE, channels=1, dtype='int16', device=MIC_DEVICE)
             sd.wait()
             ch1 = audio[:, MIC_CHANNEL] if audio.shape[1] > 1 else audio[:, 0]
             peak = float(np.abs(ch1).max())

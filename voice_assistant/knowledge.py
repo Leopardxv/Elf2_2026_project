@@ -12,7 +12,10 @@ _KNOWLEDGE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "know
 # ================================================================
 KNOWLEDGE_BASE = {
     "异物刺入": {
-        "keywords": ["异物", "铁钎", "钢筋", "刺入", "扎破", "拔出", "铁棍", "刺穿", "钉子"],
+        "keywords": [
+            "异物", "铁钎", "钢筋", "刺入", "扎破", "拔出", "拔出来",
+            "铁棍", "铁柱", "柱子", "刺穿", "贯穿", "穿透", "钉子",
+        ],
         "content": (
             "【异物刺入急救】\n"
             "1. 绝对禁止拔出异物！异物刺入体内后起到压迫止血的'塞子'作用，一旦拔出会导致大出血。\n"
@@ -146,11 +149,33 @@ KNOWLEDGE_BASE = {
 }
 
 
+def _load_synced_knowledge():
+    """Read server-managed knowledge without adding any runtime dependency."""
+    try:
+        with open(_KNOWLEDGE_PATH, "r", encoding="utf-8") as handle:
+            source = json.load(handle)
+    except (OSError, ValueError, TypeError):
+        return {}
+    if not isinstance(source, dict):
+        return {}
+    result = {}
+    for key, entry in source.items():
+        if not isinstance(key, str) or not isinstance(entry, dict):
+            continue
+        content = entry.get("content")
+        keywords = entry.get("keywords")
+        if isinstance(content, str) and isinstance(keywords, list):
+            cleaned = [keyword for keyword in keywords if isinstance(keyword, str) and keyword]
+            if cleaned:
+                result[key] = {"content": content, "keywords": cleaned}
+    return result
+
+
 class KnowledgeBase:
     """矿山自救知识库 — 关键词检索"""
 
     def __init__(self, knowledge=None):
-        self._kb = knowledge or KNOWLEDGE_BASE
+        self._kb = knowledge or {**KNOWLEDGE_BASE, **_load_synced_knowledge()}
 
     def search(self, query: str, top_k: int = 2) -> list:
         """Return top_k matching knowledge entries for a query."""

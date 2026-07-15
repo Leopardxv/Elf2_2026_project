@@ -1,0 +1,12 @@
+[Unit]
+Description=ELF2 server update pull worker
+After=network-online.target tailscaled.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/elf/miniforge3/envs/eeg/bin/python3 /home/elf/Projects/voice_assistant/board_sync.py
+Nice=10
+IOSchedulingClass=idle
+MemoryMax=96M
+CPUQuota=30%

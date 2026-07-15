@@ -3,8 +3,8 @@
 Audio I/O — lightweight wrapper around sounddevice for RK3588.
 
 Hardware:
-  Mic:  NAU8822 (device 0, card 1), ch1=right=main mic
-  Spk:  DP monitor via PulseAudio paplay (PULSE_LATENCY_MSEC=10 workaround)
+  Mic:  PulseAudio default source (BBH headset microphone)
+  Spk:  PulseAudio default sink (BBH headset speaker)
 
 All internal processing at 16000 Hz mono float32.
 """
@@ -15,10 +15,10 @@ from typing import Optional, Callable
 import os
 
 SAMPLE_RATE = 16000
-CHANNELS = 2  # stereo: ch0=left(quiet), ch1=right(main mic)
+CHANNELS = int(os.getenv("VOICE_MIC_CHANNELS", "1"))
 DTYPE = np.float32
 
-_MIC_DEVICE = 0
+_MIC_DEVICE = os.getenv("VOICE_MIC_DEVICE", "default")
 
 
 class AudioCapture:
@@ -34,7 +34,7 @@ class AudioCapture:
     def _audio_cb(self, indata: np.ndarray, frames, time, status):
         if status:
             print(f"[Audio] Warning: {status}")
-        mono = indata[:, 1] if indata.shape[1] > 1 else indata[:, 0]
+        mono = indata[:, 0]
         self._callback(mono)
 
     def start(self):
@@ -72,7 +72,7 @@ class AudioRecorder:
         self._stream: Optional[sd.InputStream] = None
 
     def _audio_cb(self, indata: np.ndarray, frames, time, status):
-        self._buffer.append((indata[:, 1] if indata.shape[1] > 1 else indata[:, 0]).copy())
+        self._buffer.append(indata[:, 0].copy())
 
     def start(self):
         self._buffer = []
@@ -97,7 +97,7 @@ class AudioRecorder:
 
 
 class AudioPlayer:
-    """Play audio via PulseAudio DP sink (paplay)."""
+    """Play audio through PulseAudio's BBH default sink."""
 
     def play(self, audio: np.ndarray, sample_rate: int = 44100):
         if audio.size == 0:

@@ -1,0 +1,2 @@
+# User crontab entry for hosts where a system service is unavailable.
+@reboot tmux new-session -d -s elf2-server-web /home/laipengxu/server/start-elf2-server-web.sh # ELF2_SERVER_WEB_AUTOSTART
